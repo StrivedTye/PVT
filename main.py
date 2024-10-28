@@ -46,13 +46,10 @@ def parse_config():
     parser.add_argument('--check_val_every_n_epoch', type=int, default=1, help='check_val_every_n_epoch')
     parser.add_argument('--preloading', action='store_true', default=False, help='preload data into memory')
     parser.add_argument('--category_name', type=str, default='Car', help='use which category to train/test')
-    parser.add_argument('--visual', action='store_true', default=False, help='visualization')
-    parser.add_argument('--attack', action='store_true', default=False, help='adversial attack')
     # ablation study for pvt
     parser.add_argument('--base_scale', type=float, default=0.25, help='voxel size for feat fusion')
     parser.add_argument('--num_knn', type=int, default=12, help='knn for feat fusion')
     parser.add_argument('--backbone_voxel', type=float, default=12, help='knn for feat fusion')
-    parser.add_argument('--re_weight', action='store_true', default=False, help='feature decorrelation')
 
     args = parser.parse_args()
     config = load_yaml(args.cfg)

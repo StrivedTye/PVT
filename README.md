@@ -1,61 +1,40 @@
-# Box-Aware Tracker (BAT)
-Pytorch-Lightning implementation of the Box-Aware Tracker.  
+# PVT
+Pytorch-Lightning implementation of the PVT Tracker.  
 
-[Box-Aware Feature Enhancement for Single Object Tracking on Point Clouds](https://openaccess.thecvf.com/content/ICCV2021/papers/Zheng_Box-Aware_Feature_Enhancement_for_Single_Object_Tracking_on_Point_Clouds_ICCV_2021_paper.pdf). **ICCV 2021** 
 
-[Chaoda Zheng](https://github.com/Ghostish/), [Xu Yan](https://yanx27.github.io/), Jiantao Gao, Weibing Zhao, Wei Zhang, [Zhen Li*](https://mypage.cuhk.edu.cn/academics/lizhen/), Shuguang Cui
-
-### Citation
-```bibtex
-@inproceedings{zheng2021box,
-  title={Box-Aware Feature Enhancement for Single Object Tracking on Point Clouds},
-  author={Zheng, Chaoda and Yan, Xu and Gao, Jiantao and Zhao, Weibing and Zhang, Wei and Li, Zhen and Cui, Shuguang},
-  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
-  pages={13199--13208},
-  year={2021}
-}
-```
-<img src="figures/results.gif" width="1000"/>
-
-### Recent Updates
-+ Add support for Waymo
-+ Add support for NuScenes
-+ ...
-### Features
-+ Modular design. It is easy to config the model and training/testing behaviors through just a `.yaml` file.
-+ DDP support for both training and testing.
-+ Provide a 3rd party implementation of [P2B](https://github.com/HaozheQi/P2B).
 ### Setup
-Installation
+#### 1. DOCKER
++ Directly pull image form DockerHub
+    ```
+    docker pull strivedtye/mink:0.5.4-pytorch1.8.2-v2-sot3d
+    ```
+#### 2. Manually install by Conda
 + Create the environment
   ```
-  git clone https://github.com/Ghostish/BAT.git
-  cd BAT
-  conda create -n bat  python=3.6
-  conda activate bat
+  git clone https://github.com/StrivedTye/PVT.git
+  cd PVT
+  conda create -n pvt  python=3.8
+  conda activate pvt
   ```
 + Install pytorch
   ```
-  conda install pytorch==1.7.0 torchvision==0.8.1 cudatoolkit=10.1 -c pytorch
+  conda install pytorch torchvision cudatoolkit=11.1 -c pytorch-lts -c nvidia
   ```
-  Our code is well tested with pytorch 1.4.0 and CUDA 10.1. But other platforms may also work. Follow [this](https://pytorch.org/get-started/locally/) to install another version of pytorch. **Note: In order to reproduce the reported results with the provided checkpoints, please use CUDA 10.x.** 
-
 + Install other dependencies:
   ```
   pip install -r requirement.txt
   ```
-  Install the nuscenes-devkit if you use want to use NuScenes dataset:
++ Install the nuscenes-devkit if you use want to use NuScenes dataset:
   ```
   pip install nuscenes-devkit
   ```
-  Install the torch-scatter
++ Install the torch-scatter
   ```
-  pip install torch-scatter -f https://data.pyg.org/whl/torch-1.7.0+cu101.html
+  conda install pytorch-scatter -c pyg
   ```
-  Install the RoIAwarePooling
++ Install MinkowskiEngine
   ```
-  cd ./roiaware_pool3d
-  python setup.py develop
+  please refer to [MinkowskiEngine](https://github.com/NVIDIA/MinkowskiEngine)
   ```
   
 
@@ -85,27 +64,12 @@ NuScenes dataset
   ```
 >Note: We use the **train_track** split to train our model and test it with the **val** split. Both splits are officially provided by NuScenes. During testing, we ignore the sequences where there is no point in the first given bbox.
 
-Waymo dataset
-+ Download and prepare dataset by the instruction of [CenterPoint](https://github.com/tianweiy/CenterPoint/blob/master/docs/WAYMO.md).
-  ```
-  [Parent Folder]
-    tfrecord_training	                    
-    tfrecord_validation	                 
-    train 	                                    -	all training frames and annotations 
-    val   	                                    -	all validation frames and annotations 
-    infos_train_01sweeps_filter_zero_gt.pkl
-    infos_val_01sweeps_filter_zero_gt.pkl
-  ```
-+ Prepare SOT dataset. Data from specific category and split will be merged (e.g., sot_infos_vehicle_train.pkl).
-```bash
-  python datasets/generate_waymo_sot.py
-```
 
 ### Quick Start
 #### Training
 To train a model, you must specify the `.yaml` file with `--cfg` argument. The `.yaml` file contains all the configurations of the dataset and the model. Currently, we provide four `.yaml` files under the [*cfgs*](./cfgs) directory. **Note:** Before running the code, you will need to edit the `.yaml` file by setting the `path` argument as the correct root of the dataset.
 ```bash
-python main.py --gpu 0 1 --cfg cfgs/BAT_Car.yaml  --batch_size 50 --epoch 60
+python main.py --gpu 0 1 --cfg cfgs/PVT_Car.yaml  --batch_size 50 --epoch 60
 ```
 After you start training, you can start Tensorboard to monitor the training process:
 ```
@@ -115,32 +79,11 @@ By default, the trainer runs a full evaluation on the full test split after trai
 #### Testing
 To test a trained model, specify the checkpoint location with `--checkpoint` argument and send the `--test` flag to the command.
 ```bash
-python main.py --gpu 0 1 --cfg cfgs/BAT_Car.yaml  --checkpoint /path/to/checkpoint/xxx.ckpt --test
+python main.py --gpu 0 1 --cfg cfgs/PVT_Car.yaml  --checkpoint /path/to/checkpoint/xxx.ckpt --test
 ```
 
-### Reproduction
-This codebase produces better results than those we report in our original paper.
-| Model | Category | Success| Precision| Checkpoint
-|--|--|--|--|--|
-| BAT-KITTI | Car	|65.37 | 78.88|pretrained_models/bat_kitti_car.ckpt
-| BAT-NuScenes | Car	|40.73 | 43.29|pretrained_models/bat_nuscenes_car.ckpt
-| BAT-KITTI | Pedestrian | 45.74| 74.53| pretrained_models/bat_kitti_pedestrian.ckpt
-
-Three trained BAT models for KITTI and NuScenes datasets are provided in the  [*pretrained_models*](./pretrained_models) directory. To reproduce the results, simply run the code with the corresponding `.yaml` file and checkpoint. For example, to reproduce the tracking results on KITTI Car, just run:
-```bash
-python main.py --gpu 0 1 --cfg cfgs/BAT_Car.yaml  --checkpoint ./pretrained_models/bat_kitti_car.ckpt --test
-```
-
-### To-dos
-- [x] DDP support
-- [x] Multi-gpus testing
-- [x] Add NuScenes dataset
-- [ ] Add codes for visualization
-- [ ] Add support for more methods
 
 ### Acknowledgment
-+ This repo is built upon [P2B](https://github.com/HaozheQi/P2B) and [SC3D](https://github.com/SilvioGiancola/ShapeCompletion3DTracking).
++ This repo is built upon [Open3DSOT](https://github.com/Ghostish/Open3DSOT).
 + Thank Erik Wijmans for his pytorch implementation of [PointNet++](https://github.com/erikwijmans/Pointnet2_PyTorch)
-
-### License
-This repository is released under MIT License (see LICENSE file for details).
++ Thank the group of [MinkowskiEngine](https://github.com/NVIDIA/MinkowskiEngine)

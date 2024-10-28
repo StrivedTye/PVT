@@ -13,6 +13,3 @@ tensorboard==2.4.1
 torchmetrics==0.4.1
 tqdm==4.61.1
 transforms3d
-learn2learn
-chamferdist
-hausdorff

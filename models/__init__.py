@@ -13,8 +13,7 @@ import importlib
 #     module = loader.find_module(module_name).load_module(module_name)
 
 
-from models import p2b, bat, stnet, m2track, attack3d
-# from models import dsdm,  gst, pvt, opt
+from models import p2b, bat, stnet, pvt
 
 def get_model(name):
     model = globals()[name.lower()].__getattribute__(name.upper())
