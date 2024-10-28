@@ -1,0 +1,93 @@
+#data
+dataset: kitti
+#cg1: /workspace/data/tracking/train_datasets/KITTI_Tracking/truly_using
+#cg3: /workspace/data/tracking/KITTI_Tracking/truly_using
+path: /dataset/KITTI_Tracking/ #/workspace/data/KITTI_Tracking/ # 
+category_name: Car # [Car, Van, Pedestrian, Cyclist, All]
+search_bb_scale: 1.25
+search_bb_offset: 2
+model_bb_scale: 1.25
+model_bb_offset: 0
+template_size: 512
+search_size: 1024
+random_sample: False
+sample_per_epoch: -1
+degrees: True # use degrees or radians
+box_aware: True
+num_candidates: 4
+coordinate_mode: velodyne
+up_axis: [0, 0, 1]
+train_split: train
+val_split: test
+test_split: test
+preload_offset: 10
+box_seven_param: False
+#use_z_offset: True  #  the offset to obtain sample box
+#limit_box_abs: True  # when generating sample box, make sure the motion is not so large.
+
+
+#model configuration
+net_model: BAT
+use_fps: True
+normalize_xyz: False
+feature_channel: 256 #the output channel of backbone
+hidden_channel: 256 #the hidden channel of xcorr
+out_channel: 256 #the output channel of xcorr
+vote_channel: 256 #the channel for vote aggregation
+num_proposal: 64
+k: 4
+use_search_bc: False
+use_search_feature: False
+bc_channel: 9
+
+# augmentation
+use_augmentation: False
+use_augment: False  # true for re_weight
+world_flip_axis: ['x']
+world_rot_angle: [-0.3925, 0.3925] # i.e. [-pi/8, pi/8]
+local_scale_range: [0.95, 1.05]
+
+# re-weight
+re_weight: False
+lrbl: 1.0
+num_f: 5
+epochb: 20
+lambdap: 70
+lambda_decay_rate: 0.3
+lambda_decay_epoch: 5
+min_lambda_times: 0.01
+decay_pow: 2
+presave_ratio: 0.9
+rw_warmup: 0
+
+# point voxel Xcorr
+base_scale: 0.25
+num_levels: 2
+truncate_k: 128
+num_knn: 4
+
+#loss configuration
+objectiveness_weight: 1.5
+box_weight: 0.2
+vote_weight: 1.0
+seg_weight: 0.2
+bc_weight: 1.0
+
+# testing config
+reference_BB: previous_result
+shape_aggregation: firstandprevious
+use_z: False     # car True; ped False; cyc True; van false
+limit_box: True # car false; ped True; cyc false; van false
+IoU_space: 3
+#save_test_path: ./visual_results/kitti_BAT
+
+#training
+batch_size: 64 #batch_size per gpu
+workers: 10
+epoch: 60
+from_epoch: 0
+lr: 0.001
+optimizer: Adam  # Adam
+lr_decay_step: 12
+lr_decay_rate: 0.2
+wd: 0

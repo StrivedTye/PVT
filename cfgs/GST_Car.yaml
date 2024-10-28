@@ -1,0 +1,78 @@
+#data
+dataset: kitti
+path: /workspace/data/tracking/KITTI_Tracking/truly_using #:
+category_name: All
+search_bb_scale: 1.25
+search_bb_offset: 2
+model_bb_scale: 1.25
+model_bb_offset: 0
+template_size: 512
+search_size: 1024
+random_sample: False
+sample_per_epoch: -1
+degrees: True # use degrees or radians, False is applied in dsdm and pvt
+box_aware: True
+num_candidates: 4
+coordinate_mode: camera #velodyne #
+up_axis: [0, -1, 0] #[0, 0, 1]  #
+train_split: train
+val_split: test
+test_split: test
+preload_offset: 10
+box_seven_param: False # only for dsdm, pvt
+parallel_seeds: False # only for dsdm, pvt
+
+#model configuration
+net_model: GST
+use_fps: False
+normalize_xyz: False
+feature_channel: 256 #the output channel of backbone
+hidden_channel: 256 #the hidden channel of xcorr
+out_channel: 256 #the output channel of xcorr
+vote_channel: 256 #the channel for vote aggregation
+num_proposal: 64
+bc_channel: 9
+k: 4
+use_search_bc: False
+use_search_feature: False
+num_voxels_roi: 6
+max_pts_each_voxel: 128
+learn_R: True
+num_R: 3
+
+# meta configuration
+use_domains: True
+train_domains: [Van, Pedestrian, Cyclist]  #[Van, Car, Cyclist]  #
+test_domains: Car  # Pedestrian  #
+baseline: P2B
+meta_inner_lr: 0.0005 # 3e-4
+meta_inner_steps: 1
+
+#loss configuration
+objectiveness_weight: 1.5
+delta_weight: 1.0  # dsdm
+seed_weight: 0.2  # dsdm
+bc_weight: 1.0
+box_weight: 0.2
+vote_weight: 1.0
+seg_weight: 0.2
+
+# testing config
+reference_BB: previous_result
+shape_aggregation: firstandprevious
+use_z: False
+limit_box: True
+IoU_space: 3
+
+#training
+batch_size: 50 #batch_size per gpu
+workers: 10
+epoch: 60
+from_epoch: 0
+lr: 0.001
+optimizer: Adam
+lr_decay_step: 12
+lr_decay_rate: 0.1  # 0.1 for P2B, 0.2 for BAT
+wd: 0
+checkpoint: None
+warmup_num: 0

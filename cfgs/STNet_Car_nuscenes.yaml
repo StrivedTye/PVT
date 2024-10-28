@@ -1,0 +1,90 @@
+#data
+dataset: nuscenes
+path: /dataset/nuscenes/
+version: v1.0-trainval
+category_name: Car # [Car, Van, Pedestrian, Cyclist, All]
+search_bb_scale: 1  # stnet use 1
+search_bb_offset: 2
+model_bb_scale: 1.25
+model_bb_offset: 0
+template_size: 512
+search_size: 1024
+random_sample: False
+sample_per_epoch: -1
+degrees: True # use degrees or radians
+box_aware: True
+num_candidates: 4
+up_axis: [0, 0, 1]
+preload_offset: 10
+key_frame_only: True
+train_split: train_track
+val_split: val
+test_split: test
+min_points: 1 # #
+box_seven_param: False
+use_z_offset: True  #  the offset to obtain sample box
+limit_box_abs: True  # when generating sample box, make sure the motion is not so large.
+
+# augmentation
+use_augment: False  # augment after post-processing
+world_flip_axis: ['x']
+world_rot_angle: [-0.3925, 0.3925] # i.e. [-pi/8, pi/8]
+local_scale_range: [0.95, 1.05]
+
+#model configuration
+net_model: STNET
+use_fps: True
+use_xyz: True
+use_voxel_rpn: True
+normalize_xyz: False
+
+feat_emb: 32 # xcorr channel
+iters: 2    # xcorr
+knn_num: 48 # xcorr
+
+# voxelization of rpn
+voxel_size: [0.3, 0.3, 0.3]
+xy_size: [0.3, 0.3]
+area_extents: [-5.6, 5.6, -3.6, 3.6, -2.4, 2.4]
+xy_area_extents: [-5.6, 5.6, -3.6, 3.6]
+downsample: 1.0
+regress_radius: 2
+
+# re-weight
+re_weight: False
+lrbl: 3.0
+num_f: 5
+epochb: 20
+lambdap: 70
+lambda_decay_rate: 0.3
+lambda_decay_epoch: 5
+min_lambda_times: 0.01
+decay_pow: 2
+presave_ratio: 0.9
+rw_warmup: 0
+
+#loss configuration
+hm_weight: 1.0
+loc_weight: 1.0
+z_weight: 2.0
+seg_weight: 0.5
+bc_weight: 0
+
+# testing config
+reference_BB: previous_result
+shape_aggregation: firstandprevious
+use_z: True
+limit_box: False
+IoU_space: 3
+
+#training
+batch_size: 64 #batch_size per gpu 48
+workers: 12 # 12
+epoch: 60
+from_epoch: 0
+lr: 0.001
+optimizer: Adam  # Adam
+lr_decay_step: 10
+lr_decay_rate: 0.2
+wd: 0
+betas: [0.9, 0.999]
